@@ -1,7 +1,7 @@
 # rust-docxtpl
 
 [![CI](https://github.com/Anthony-Hoo/rust-docxtpl/actions/workflows/ci.yml/badge.svg)](https://github.com/Anthony-Hoo/rust-docxtpl/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/rust-docxtpl.svg)](https://pypi.org/project/rust-docxtpl/)
+[![PyPI](https://img.shields.io/pypi/v/rust-docxtpl)](https://pypi.org/project/rust-docxtpl/)
 
 English | [简体中文](README.zh-CN.md)
 

@@ -1,7 +1,7 @@
 # rust-docxtpl
 
 [![CI](https://github.com/Anthony-Hoo/rust-docxtpl/actions/workflows/ci.yml/badge.svg)](https://github.com/Anthony-Hoo/rust-docxtpl/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/rust-docxtpl.svg)](https://pypi.org/project/rust-docxtpl/)
+[![PyPI](https://img.shields.io/pypi/v/rust-docxtpl)](https://pypi.org/project/rust-docxtpl/)
 
 English | [简体中文](https://github.com/Anthony-Hoo/rust-docxtpl/blob/main/README.zh-CN.md)（中文全文见下方）
 
@@ -212,7 +212,7 @@ LGPL-2.1-only, as a derivative of docxtpl. See `LICENSE` and `NOTICE`.
 # rust-docxtpl
 
 [![CI](https://github.com/Anthony-Hoo/rust-docxtpl/actions/workflows/ci.yml/badge.svg)](https://github.com/Anthony-Hoo/rust-docxtpl/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/rust-docxtpl.svg)](https://pypi.org/project/rust-docxtpl/)
+[![PyPI](https://img.shields.io/pypi/v/rust-docxtpl)](https://pypi.org/project/rust-docxtpl/)
 
 [English](https://github.com/Anthony-Hoo/rust-docxtpl/blob/main/README.md) (full English text above) | 简体中文
 
