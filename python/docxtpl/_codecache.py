@@ -92,16 +92,36 @@ _RUNTIME = "|".join((
 ))
 
 
+def _digest_code(code, hasher):
+    """Feed a code object to ``hasher`` deterministically.
+
+    ``marshal.dumps(code)`` is not suitable: before Python 3.11 its output
+    depends on reference counts, so two interpreters describe the same
+    function differently. Bytecode, names and constants (nested code objects
+    recursively, sets in sorted order) are what a filter's behaviour depends on.
+    """
+    hasher.update(code.co_code)
+    hasher.update(repr(code.co_names).encode("utf-8"))
+    for constant in code.co_consts:
+        if isinstance(constant, types.CodeType):
+            _digest_code(constant, hasher)
+        elif isinstance(constant, frozenset):
+            hasher.update(repr(sorted(map(repr, constant))).encode("utf-8"))
+        else:
+            hasher.update(repr(constant).encode("utf-8"))
+
+
 def _describe_callable(function):
     """Identity-free description: what the function is, not where it lives in memory."""
     code = getattr(function, "__code__", None)
     if isinstance(code, types.CodeType):
-        try:
-            body = hashlib.sha256(marshal.dumps(code)).hexdigest()
-        except ValueError:  # unmarshallable constant
-            return None
+        hasher = hashlib.sha256()
+        _digest_code(code, hasher)
+        body = hasher.hexdigest()
+    elif isinstance(function, (types.BuiltinFunctionType, type)):
+        body = repr(function)  # builtins and classes repr without an address
     else:
-        body = repr(function)  # builtins repr without an address
+        return None  # partials, callable objects: no stable description
     return "%s:%s:%s" % (getattr(function, "__module__", None), getattr(function, "__qualname__", None), body)
 
 

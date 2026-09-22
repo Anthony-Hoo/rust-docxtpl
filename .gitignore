@@ -10,3 +10,4 @@ __pycache__/
 .pytest_cache/
 *.pdb
 .venv-win/
+.venv-win310/
