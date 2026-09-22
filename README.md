@@ -3,6 +3,8 @@
 [![CI](https://github.com/Anthony-Hoo/rust-docxtpl/actions/workflows/ci.yml/badge.svg)](https://github.com/Anthony-Hoo/rust-docxtpl/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/rust-docxtpl.svg)](https://pypi.org/project/rust-docxtpl/)
 
+English | [简体中文](README.zh-CN.md)
+
 Rust-accelerated, drop-in distribution of the `docxtpl` import package.
 Compatibility baseline: **docxtpl 0.20.1** (python-docx 1.2.0, Jinja2 3.1.x).
 

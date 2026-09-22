@@ -47,4 +47,4 @@ manifest-path = "crates/py/Cargo.toml"
 python-source = "python"
 module-name = "docxtpl._native"
 features = ["pyo3/extension-module"]
-include = ["LICENSE", "NOTICE", "CHANGELOG.md"]
+include = ["LICENSE", "NOTICE", "CHANGELOG.md", "README.zh-CN.md"]
