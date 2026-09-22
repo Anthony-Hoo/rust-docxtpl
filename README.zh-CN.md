@@ -84,6 +84,16 @@ python-docx / lxml 对象，`render()` 前后都可以修改。**不要**和原�
 的子类、扩展、`finalize` 钩子、可调用的 `autoescape`，以及是闭包、绑定方法或
 可调用对象的过滤器 / 测试，都会关闭对应的缓存层。
 
+编译后的代码还可以通过磁盘缓存在*进程之间*共享：设置
+`DOCXTPL_CODE_CACHE_DIR=/path`（或调用
+`docxtpl.configure_code_cache(path, max_entries=512)`）。pre-fork 服务器的
+worker 会被轮换，否则几乎每个请求都要重新 lex、parse、compile 数 MB 的源码。
+条目是 `marshal` 序列化的代码对象，键由源码摘要、环境的稳定描述（自定义过滤器 /
+测试的名字和代码、`undefined`、policies、词法设置）以及 Python / Jinja2 / marshal
+版本组成；损坏的条目会被丢弃，目录大小由 `DOCXTPL_CODE_CACHE_MAX_ENTRIES` 限制。
+与 `jinja2.FileSystemBytecodeCache` 一样，该目录里的代码会被执行，因此只能由
+应用自己写入。默认关闭。
+
 ### 可观测性
 
 ```python

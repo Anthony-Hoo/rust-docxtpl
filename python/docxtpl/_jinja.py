@@ -15,7 +15,7 @@ from jinja2 import Environment, Template, nodes
 from jinja2.compiler import CodeGenerator
 from jinja2.defaults import DEFAULT_FILTERS, DEFAULT_TESTS
 
-from . import _stats
+from . import _codecache, _stats
 from ._cache import cache, str_nbytes
 
 
@@ -137,7 +137,13 @@ def template_from_string(env, source):
                 key = ("code", digest, fingerprint)
                 code = cache.get(key)
                 if code is None:
-                    code = _compile(env, source, key)
+                    code = _codecache.get(digest, fingerprint)
+                    if code is not None:
+                        cache.put(key, code, str_nbytes(source) + 4096)
+                    else:
+                        code = _compile(env, source, key)
+                        if code is not _UNCACHEABLE and code is not None:
+                            _codecache.put(digest, fingerprint, code)
                 if code is not _UNCACHEABLE and code is not None:
                     _stats.count("jinja_compile_reused")
                     return env.template_class.from_code(env, code, env.make_globals(None), None)

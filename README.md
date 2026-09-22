@@ -92,6 +92,18 @@ document or callback result. Environments are fingerprinted on every call
 hook, callable `autoescape`, or filters/tests that are closures, bound
 methods or callable objects disable the corresponding layer.
 
+Compiled code can additionally be shared *between processes* through an
+on-disk cache: set `DOCXTPL_CODE_CACHE_DIR=/path` (or call
+`docxtpl.configure_code_cache(path, max_entries=512)`). A pre-fork server
+whose workers are recycled otherwise lexes, parses and compiles the multi-MB
+source on nearly every request. Entries are `marshal`ed code objects keyed by
+the source digest plus a stable description of the environment (names and
+code of custom filters/tests, `undefined`, policies, lexer settings) and the
+Python/Jinja2/marshal versions; corrupt entries are dropped, the directory is
+bounded by `DOCXTPL_CODE_CACHE_MAX_ENTRIES`. As with
+`jinja2.FileSystemBytecodeCache`, code from that directory is executed, so
+only the application may write there. Off by default.
+
 ### Observability
 
 ```python

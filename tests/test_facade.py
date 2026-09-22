@@ -372,3 +372,123 @@ def test_public_names_are_declared_for_type_checkers():
                  "RP", "Listing", "Subdoc"):
         assert name in docxtpl.__all__ and hasattr(docxtpl, name)
     assert all(hasattr(docxtpl, name) for name in docxtpl.__all__)
+
+
+# -- on-disk compiled-code cache ----------------------------------------------
+
+
+@pytest.fixture()
+def code_cache_dir(tmp_path):
+    directory = tmp_path / "code-cache"
+    docxtpl.configure_code_cache(directory)
+    yield directory
+    docxtpl.configure_code_cache(None)
+
+
+def render_with_filter(path, function):
+    env = Environment()
+    env.filters["voice"] = function
+    tpl = DocxTemplate(path)
+    tpl.render({"name": "Ada"}, jinja_env=env)
+    return body_text(tpl)
+
+
+def test_code_cache_is_off_unless_configured(tmp_path):
+    path = make_docx(tmp_path, "{{ name }}")
+    DocxTemplate(path).render({"name": "x"})
+    assert docxtpl.code_cache_info()["directory"] is None
+    assert not any(k.startswith("code_cache") for k in counters())
+
+
+def test_code_cache_survives_a_cleared_process_cache(tmp_path, code_cache_dir):
+    path = make_docx(tmp_path, "{{ name|voice }}")
+    assert render_with_filter(path, shout) == "ADA"
+    assert counters()["code_cache_store"] == 1
+    assert docxtpl.code_cache_info()["entries"] == 1
+    docxtpl.cache_clear()
+    docxtpl.reset_stats()
+    assert render_with_filter(path, shout) == "ADA"
+    assert counters()["code_cache_hit"] == 1
+    assert counters()["jinja_compile_reused"] == 1
+    assert "code_cache_store" not in counters()
+
+
+def test_code_cache_key_covers_filter_code_not_identity(tmp_path, code_cache_dir):
+    path = make_docx(tmp_path, "{{ name|voice }}")
+    assert render_with_filter(path, shout) == "ADA"
+    docxtpl.cache_clear()
+    docxtpl.reset_stats()
+    assert render_with_filter(path, whisper) == "ada"
+    assert counters()["code_cache_miss"] == 1
+    assert docxtpl.code_cache_info()["entries"] == 2
+
+
+def test_code_cache_is_shared_with_a_fresh_interpreter(tmp_path, code_cache_dir):
+    path = make_docx(tmp_path, "{{ name|upper }} {{ 2 + 2 }}")
+    DocxTemplate(path).render({"name": "Ada"})
+    assert counters()["code_cache_store"] == 1
+    import os
+    import subprocess
+    import sys
+
+    script = (
+        "import docxtpl, sys; from docxtpl import DocxTemplate;"
+        "tpl = DocxTemplate(sys.argv[1]); tpl.render({'name': 'Ada'});"
+        "import io, zipfile; from lxml import etree; s = io.BytesIO(); tpl.save(s);"
+        "print(''.join(etree.fromstring(zipfile.ZipFile(s).read('word/document.xml'))"
+        ".xpath('//*[local-name()=\"t\"]/text()')));"
+        "print(docxtpl.stats()['counters'])"
+    )
+    env = dict(os.environ, DOCXTPL_CODE_CACHE_DIR=str(code_cache_dir))
+    out = subprocess.run(
+        [sys.executable, "-c", script, str(path)], env=env, check=True, capture_output=True, text=True
+    ).stdout
+    assert out.splitlines()[0] == "ADA 4"
+    assert "'code_cache_hit': 1" in out
+    assert "code_cache_store" not in out
+
+
+def test_corrupt_code_cache_entry_is_replaced(tmp_path, code_cache_dir):
+    path = make_docx(tmp_path, "{{ name }}")
+    DocxTemplate(path).render({"name": "x"})
+    (entry,) = list(code_cache_dir.iterdir())
+    entry.write_bytes(b"garbage")
+    docxtpl.cache_clear()
+    docxtpl.reset_stats()
+    tpl = DocxTemplate(path)
+    tpl.render({"name": "y"})
+    assert body_text(tpl) == "y"
+    assert counters()["code_cache_error"] == 1
+    assert counters()["code_cache_store"] == 1
+    assert entry.read_bytes() != b"garbage"
+
+
+def test_uncacheable_constant_folding_never_reaches_disk(tmp_path, code_cache_dir):
+    path = make_docx(tmp_path, "{{ 'ada'|voice }}")  # constant input: folded at compile time
+    assert render_with_filter(path, shout) == "ADA"
+    assert render_with_filter(path, whisper) == "ada"
+    assert docxtpl.code_cache_info()["entries"] == 0
+
+
+def test_closure_filters_never_reach_disk(tmp_path, code_cache_dir):
+    path = make_docx(tmp_path, "{{ name|tag }}")
+    env = Environment()
+    env.filters["tag"] = (lambda s: (lambda value: value + s))("-1")
+    tpl = DocxTemplate(path)
+    tpl.render({"name": "n"}, jinja_env=env)
+    assert body_text(tpl) == "n-1"
+    assert docxtpl.code_cache_info()["entries"] == 0
+
+
+def test_code_cache_prunes_oldest_entries(tmp_path):
+    from docxtpl import _codecache
+
+    directory = tmp_path / "bounded"
+    docxtpl.configure_code_cache(directory, max_entries=3)
+    _codecache._puts = 0  # pruning runs every _PRUNE_EVERY stores, process-wide
+    try:
+        for index in range(_codecache._PRUNE_EVERY):
+            DocxTemplate(make_docx(tmp_path, "{{ v }} %d" % index, name="t%d.docx" % index)).render({"v": 1})
+        assert docxtpl.code_cache_info()["entries"] == 3
+    finally:
+        docxtpl.configure_code_cache(None)

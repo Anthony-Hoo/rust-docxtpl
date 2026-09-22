@@ -3,6 +3,20 @@
 Versions of `rust-docxtpl` are independent of docxtpl. The compatibility
 baseline is recorded per release; `docxtpl.__version__` keeps reporting it.
 
+## 0.1.1 (2026-09-22) — baseline docxtpl 0.20.1
+
+- Optional on-disk cache of compiled template code shared between processes
+  (`DOCXTPL_CODE_CACHE_DIR`, or `docxtpl.configure_code_cache()`). The
+  process-local cache only helped the second render in the same interpreter;
+  a pre-fork web server with many short-lived workers recompiled the multi-MB
+  Jinja source on nearly every request. Keys cover the template source
+  digest, a stable description of the environment (names and code of custom
+  filters/tests, `undefined`, policies, lexer settings) and the Python,
+  Jinja2 and marshal versions. Entries that constant-fold a custom callable
+  or come from a closure/bound-method filter are never written, exactly as
+  they were never held in memory. Off by default; new counters
+  `code_cache_hit/miss/store/error`.
+
 ## 0.1.0 (2026-09-22) — baseline docxtpl 0.20.1
 
 Same public API, same output. Differences in mechanism:
