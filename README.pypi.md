@@ -10,7 +10,7 @@ Compatibility baseline: **docxtpl 0.20.1** (python-docx 1.2.0, Jinja2 3.1.x).
 
 ```diff
 - docxtpl==0.20.1
-+ rust-docxtpl==0.1.0
++ rust-docxtpl
 ```
 
 ```bash
@@ -221,7 +221,7 @@ LGPL-2.1-only, as a derivative of docxtpl. See `LICENSE` and `NOTICE`.
 
 ```diff
 - docxtpl==0.20.1
-+ rust-docxtpl==0.1.0
++ rust-docxtpl
 ```
 
 ```bash

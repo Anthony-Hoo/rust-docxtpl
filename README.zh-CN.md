@@ -10,7 +10,7 @@
 
 ```diff
 - docxtpl==0.20.1
-+ rust-docxtpl==0.1.0
++ rust-docxtpl
 ```
 
 ```bash
