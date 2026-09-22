@@ -1,0 +1,27 @@
+rust-docxtpl
+============
+
+This distribution is a derivative work of python-docx-template ("docxtpl")
+0.20.1 by Eric Lapouyade, https://github.com/elapouya/python-docx-template,
+licensed under the GNU Lesser General Public License v2.1 (see LICENSE).
+
+Provenance of the files under python/docxtpl/:
+
+  copied verbatim from docxtpl 0.20.1
+      __main__.py, inline_image.py, listing.py, richtext.py, subdoc.py
+  extracted verbatim from docxtpl 0.20.1 template.py (reference behaviour,
+  fallback path and test oracle)
+      _reference.py
+  modified from docxtpl 0.20.1 (hot paths rerouted; see CHANGELOG.md)
+      __init__.py, template.py
+  new in rust-docxtpl
+      accel.py, _cache.py, _install_check.py, _jinja.py, _stats.py, py.typed
+
+The Rust crates under crates/ are new code. They re-implement, as
+hand-written scanners, the behaviour of the regular expressions in
+docxtpl 0.20.1's DocxTemplate.patch_xml / render_xml_part / resolve_listing
+and are distributed under the same license.
+
+No template, fixture or document from any private corpus is part of this
+distribution. tests/ and crates/core/tests/golden.json contain synthetic
+inputs only.

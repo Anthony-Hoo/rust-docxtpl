@@ -1,0 +1,13 @@
+[package]
+name = "docxtpl-core"
+description = "Pure-Rust text kernels of rust-docxtpl (no Python dependency)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+memchr = "2"
+
+[dev-dependencies]
+serde_json = "1"

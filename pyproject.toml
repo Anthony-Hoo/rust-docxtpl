@@ -1,0 +1,50 @@
+[build-system]
+requires = ["maturin>=1.9,<2"]
+build-backend = "maturin"
+
+[project]
+name = "rust-docxtpl"
+version = "0.1.0"
+description = "Rust-accelerated drop-in replacement for docxtpl (import name stays `docxtpl`)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "LGPL-2.1-only" }
+keywords = ["jinja2", "docx", "template"]
+authors = [{ name = "Anthony Hoo" }]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Rust",
+    "Topic :: Office/Business",
+    "Topic :: Text Processing :: Markup :: XML",
+]
+
+# docxcompose is a hard dependency: the application uses subdocuments without
+# requesting a `[subdoc]` extra.
+dependencies = ["python-docx>=1.1.1", "docxcompose", "jinja2", "lxml"]
+
+[project.optional-dependencies]
+subdoc = []
+
+[project.urls]
+Homepage = "https://github.com/Anthony-Hoo/rust-docxtpl"
+Repository = "https://github.com/Anthony-Hoo/rust-docxtpl"
+Changelog = "https://github.com/Anthony-Hoo/rust-docxtpl/blob/main/CHANGELOG.md"
+Upstream = "https://github.com/elapouya/python-docx-template"
+
+[tool.maturin]
+manifest-path = "crates/py/Cargo.toml"
+python-source = "python"
+module-name = "docxtpl._native"
+features = ["pyo3/extension-module"]
+include = ["LICENSE", "NOTICE", "CHANGELOG.md"]
