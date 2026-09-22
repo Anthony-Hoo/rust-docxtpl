@@ -114,7 +114,7 @@ jobs:
           pattern: wheels-*
           path: dist
           merge-multiple: true
-      - run: pip install --only-binary :all: --find-links dist rust-docxtpl pytest
+      - run: pip install --only-binary ":all:" --find-links dist rust-docxtpl pytest
       - run: pip check
       - run: pytest tests -q -p no:cacheprovider
 
