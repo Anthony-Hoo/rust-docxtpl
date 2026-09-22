@@ -10,7 +10,7 @@ package, behaviour-compatible with docxtpl 0.20.1.
 __version__ = "0.20.1"
 #: Version of the rust-docxtpl distribution (``__version__`` stays the
 #: compatibility baseline so that version checks in applications keep working).
-__rust_docxtpl_version__ = "0.1.1"
+__rust_docxtpl_version__ = "0.1.2"
 
 # flake8: noqa
 from . import _install_check
